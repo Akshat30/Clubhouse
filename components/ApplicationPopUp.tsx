@@ -93,6 +93,11 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
   const [activeSection, setActiveSection] = useState<string>('application');
   const supabase = createClient();
   const [uploading, setUploading] = useState(false);
+  const [score, setScore] = useState('');
+  const [currentScore, setCurrentScore] = useState('');
+
+  const [scoreResume, setScoreResume] = useState('');
+  const [currentScoreResume, setCurrentScoreResume] = useState(''); // State to store the current score fetched from the database
 
   const handleViewDocument = (documentUrl: string) => {
     setViewDocument(documentUrl);
@@ -108,6 +113,7 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
 
   const [avatarUrl, setAvatarUrl] = useState<string>('');
   const [error, setError] = useState('');
+  const [total, setTotal] = useState(0);
 
   const [ivAverages, setIvAverages] = useState({
     empathy: 0,
@@ -117,9 +123,52 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
     socially_aware: 0,
   });
 
+  const [averages, setAverages] = useState({
+    leadership_avg: 0,
+    teamwork_avg: 0,
+    analytical_avg: 0,
+    public_speaking_avg: 0,
+  });
+
+  useEffect(() => {
+    let tot = parseFloat(
+      Object.values(ivAverages)
+        .reduce((acc, cur) => acc + cur, 0)
+        .toFixed(2)
+    );
+
+    tot += parseFloat(
+      Object.values(averages)
+        .reduce((acc, cur) => acc + cur, 0)
+        .toFixed(2)
+    );
+
+    tot += parseFloat(currentScore);
+    tot += parseFloat(currentScoreResume);
+
+    setTotal(tot);
+  }, [ivAverages, averages, currentScore, currentScoreResume]);
+
   useEffect(() => {
     setIvAverages(calculateIvAverages(interviews));
   }, [interviews]);
+
+  useEffect(() => {
+    const updateTot = async () => {
+      if (total > 0) {
+        const { data, error } = await supabase
+          .from('users')
+          .update({ total_score: total })
+          .eq('id', userID);
+
+        if (error) {
+          console.log(error.message);
+          alert(`Error: ${error.message}`);
+        }
+      }
+    };
+    updateTot();
+  }, [total]);
 
   const calculateIvAverages = (interviews: Interview[]) => {
     const totalScores = interviews.reduce(
@@ -150,13 +199,6 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
     return averages;
   };
 
-  const [averages, setAverages] = useState({
-    leadership_avg: 0,
-    teamwork_avg: 0,
-    analytical_avg: 0,
-    public_speaking_avg: 0,
-  });
-
   useEffect(() => {
     setAverages(calculateAverages(cases));
   }, [cases]);
@@ -186,6 +228,104 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
     };
 
     return averages;
+  };
+
+  const handleScoreChange = (e: any) => {
+    const value = e.target.value;
+    const numValue = Number(value);
+    if (value === '' || (numValue >= 1 && numValue <= 10)) {
+      setScore(value);
+    }
+  };
+
+  useEffect(() => {
+    const fetchCurrentScore = async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('app_score')
+        .eq('id', userID)
+        .single();
+
+      if (error) {
+        console.error('Error fetching current score:', error.message);
+      } else if (data) {
+        setCurrentScore(data.app_score); // Update state with the fetched score
+      }
+    };
+
+    if (userID) {
+      fetchCurrentScore();
+    }
+  }, [userID]);
+
+  const handleScoreChangeResume = (e: any) => {
+    const value = e.target.value;
+    const numValue = Number(value);
+    if (value === '' || (numValue >= 1 && numValue <= 10)) {
+      setScoreResume(value);
+    }
+  };
+
+  useEffect(() => {
+    const fetchCurrentScoreResume = async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('resume_score')
+        .eq('id', userID)
+        .single();
+
+      if (error) {
+        console.error('Error fetching current score:', error.message);
+      } else if (data) {
+        setCurrentScoreResume(data.resume_score); // Update state with the fetched score
+      }
+    };
+
+    if (userID) {
+      fetchCurrentScoreResume();
+    }
+  }, [userID]);
+
+  const handleSubmit = async () => {
+    if (score === '') {
+      alert('Please enter a score before submitting.');
+      return;
+    }
+
+    setCurrentScore(score);
+
+    const { data, error } = await supabase
+      .from('users')
+      .update({ app_score: score })
+      .eq('id', userID);
+
+    if (error) {
+      alert(`Error: ${error.message}`);
+    } else {
+      alert('Score updated successfully!');
+      setScore(''); // Optionally reset the score input after successful submission
+    }
+  };
+
+  const handleSubmitResume = async () => {
+    if (scoreResume === '') {
+      alert('Please enter a score before submitting.');
+      return;
+    }
+
+    setCurrentScoreResume(scoreResume);
+
+    const { data, error } = await supabase
+      .from('users')
+      .update({ resume_score: scoreResume })
+      .eq('id', userID);
+
+    if (error) {
+      alert(`Error: ${error.message}`);
+    } else {
+      alert('Score updated successfully!');
+      setScoreResume(''); // Optionally reset the score input after successful submission
+    }
   };
 
   const uploadImage = async (event: any) => {
@@ -443,15 +583,67 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                           .toFixed(2)}
                       </li>
                       <li>
-                        <span className="font-semibold">Application:</span> [Add
-                        Score Here]
+                        <span className="font-semibold">
+                          Application Score:
+                        </span>{' '}
+                        <span>
+                          {currentScore !== '' ? currentScore : 'not set'}
+                        </span>
+                        {isPIC ? (
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="text"
+                              inputMode="numeric" // Helps bring up numeric keypad on mobile devices
+                              pattern="[1-9]|10" // Ensures only numbers between 1 and 10 are accepted
+                              className="input mt-1 p-1 rounded text-xs text-black"
+                              placeholder="Enter a score (1-10)"
+                              value={score}
+                              onChange={handleScoreChange}
+                            />
+                            <button
+                              onClick={handleSubmit}
+                              className="bg-blue-500 hover:bg-blue-700 text-xs text-white font-bold mt-1 py-1 px-2 rounded"
+                            >
+                              Submit
+                            </button>
+                          </div>
+                        ) : (
+                          <></>
+                        )}
                       </li>
                       <li>
-                        <span className="font-semibold">Resume:</span> [Add
-                        Score Here]
+                        <span className="font-semibold">Resume Score:</span>{' '}
+                        <span>
+                          {currentScoreResume !== ''
+                            ? currentScoreResume
+                            : 'not set'}
+                        </span>
+                        {isPIC ? (
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="text"
+                              inputMode="numeric" // Helps bring up numeric keypad on mobile devices
+                              pattern="[1-9]|10" // Ensures only numbers between 1 and 10 are accepted
+                              className="input mt-1 p-1 rounded text-xs text-black"
+                              placeholder="Enter a score (1-10)"
+                              value={scoreResume}
+                              onChange={handleScoreChangeResume}
+                            />
+                            <button
+                              onClick={handleSubmitResume}
+                              className="bg-blue-500 hover:bg-blue-700 text-xs text-white font-bold mt-1 py-1 px-2 rounded"
+                            >
+                              Submit
+                            </button>
+                          </div>
+                        ) : (
+                          <></>
+                        )}
                       </li>
                       <li>
-                        <span className="font-semibold">Total Score:</span>
+                        <span className="font-semibold">
+                          Total Score: {total}
+                        </span>
                       </li>
                     </ul>
                   </div>

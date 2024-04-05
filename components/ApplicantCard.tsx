@@ -26,6 +26,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
   onViewApplication,
 }) => {
   const [avatarUrl, setAvatarUrl] = useState<string>('');
+  const [total, setTotal] = useState(0);
   const supabase = createClient();
   useEffect(() => {
     const fetchAvatarUrl = async () => {
@@ -44,6 +45,25 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
 
     fetchAvatarUrl();
   }, [applicant.id, supabase]);
+
+  useEffect(() => {
+    const fetchTotal = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('total_score')
+          .eq('id', applicant.id);
+        
+        if (error) throw error;
+        if (data) setTotal(data[0].total_score);
+      } catch (error: any) {
+        console.error('Error fetching avatar URL:', error.message);
+      }
+    };
+
+    fetchTotal();
+  }, [applicant.id]);
+
   return (
     <button
       onClick={() =>
@@ -52,7 +72,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
       }
       className="hover:scale-[1.03] transition duration-200"
     >
-      <div className="bg-btn-background rounded-lg shadow-lg p-4 m-2 flex flex-col items-start">
+      <div className="bg-btn-background rounded-lg shadow-lg p-3 m-2 flex flex-col items-start">
         <div className="flex flex-row">
           {avatarUrl ? (
             <img
@@ -69,6 +89,9 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
             <h3 className="font-bold text-lg">{applicant.full_name}</h3>
             <p className="text-xs">{applicant.email}</p>
           </div>
+        </div>
+        <div className="mt-2">
+          <span>Total Score: {total}</span>
         </div>
       </div>
     </button>
