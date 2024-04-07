@@ -26,7 +26,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
   onViewApplication,
 }) => {
   const [avatarUrl, setAvatarUrl] = useState<string>('');
-  const [total, setTotal] = useState(0);
+  //const [total, setTotal] = useState(0);
   const supabase = createClient();
   useEffect(() => {
     const fetchAvatarUrl = async () => {
@@ -46,23 +46,23 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
     fetchAvatarUrl();
   }, [applicant.id, supabase]);
 
-  useEffect(() => {
-    const fetchTotal = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('total_score')
-          .eq('id', applicant.id);
+  // useEffect(() => {
+  //   const fetchTotal = async () => {
+  //     try {
+  //       const { data, error } = await supabase
+  //         .from('users')
+  //         .select('total_score')
+  //         .eq('id', applicant.id);
         
-        if (error) throw error;
-        if (data) setTotal(data[0].total_score);
-      } catch (error: any) {
-        console.error('Error fetching avatar URL:', error.message);
-      }
-    };
+  //       if (error) throw error;
+  //       if (data) setTotal(data[0].total_score);
+  //     } catch (error: any) {
+  //       console.error('Error fetching avatar URL:', error.message);
+  //     }
+  //   };
 
-    fetchTotal();
-  }, [applicant.id]);
+  //   fetchTotal();
+  // }, [applicant.id]);
 
   return (
     <button
@@ -90,9 +90,9 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
             <p className="text-xs">{applicant.email}</p>
           </div>
         </div>
-        <div className="mt-2">
+        {/* <div className="mt-2">
           <span>Total Score: {total}</span>
-        </div>
+        </div> */}
       </div>
     </button>
   );

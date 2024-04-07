@@ -21,7 +21,7 @@ export default async function Index() {
       <div className="animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-4xl px-3">
         <div className="flex flex-col gap-8 sm:gap-16 items-center">
           <p className="text-3xl lg:text-4xl !leading-tight mx-auto max-w-xl text-center mt-32">
-            Welcome to the application portal! 
+            Welcome to the application portal!
           </p>
           <p className="text-2xl lg:text-4xl !leading-tight mx-auto max-w-xl text-center">
             Please sign in.
@@ -30,6 +30,10 @@ export default async function Index() {
         </div>
         <main className="flex flex-col justify-center items-center">
           <GoogleOAuth />
+          <div className="text-gray-400 text-xs mt-4">
+            *When signing in, it will ask to continue to {' '}
+            <span className='font-bold'>kvuilkasrtgyazkvxjal.supabase.co</span>
+          </div>
         </main>
       </div>
     </div>
