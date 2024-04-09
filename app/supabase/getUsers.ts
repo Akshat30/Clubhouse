@@ -21,7 +21,11 @@ export async function getUsers() {
   }
 
   if (isPIC) {
-    const { data, error } = await supabase.from('users').select('*');
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('is_active', false)
+      .eq('is_pic', false);;
     if (error) {
       console.error(error);
     } else {
