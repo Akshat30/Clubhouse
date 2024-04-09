@@ -206,8 +206,8 @@ export async function getInterviewProspects(): Promise<
     const { data, error } = await supabase
       .from('users')
       .select('full_name, email, id')
-      // .eq('is_active', false)
-      // .eq('is_pic', false);
+      .eq('is_active', false)
+      .eq('is_pic', false);
 
     if (error) {
       console.error('Error fetching interview prospects:', error.message);
