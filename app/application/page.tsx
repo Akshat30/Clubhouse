@@ -28,6 +28,7 @@ export default async function ProtectedPage() {
           <p className="text-3xl lg:text-4xl !leading-tight mx-auto max-w-xl text-center">
             Spring '24 Rush Application
           </p>
+          <p className="text-gray-500 mt-4">If you're having any issues or have any questions, please contact AJ/Christen @ 6507720579/5103345535</p>
           <div className="w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8" />
           <NameForm />
         </div>
