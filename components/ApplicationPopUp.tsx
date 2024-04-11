@@ -594,9 +594,9 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                             <input
                               type="text"
                               inputMode="numeric" // Helps bring up numeric keypad on mobile devices
-                              pattern="[1-9]|10" // Ensures only numbers between 1 and 10 are accepted
+                              pattern="[1-7]|8" // Ensures only numbers between 1 and 10 are accepted
                               className="input mt-1 p-1 rounded text-xs text-black"
-                              placeholder="Enter a score (1-10)"
+                              placeholder="Enter a score (1-8)"
                               value={score}
                               onChange={handleScoreChange}
                             />
@@ -623,9 +623,9 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                             <input
                               type="text"
                               inputMode="numeric" // Helps bring up numeric keypad on mobile devices
-                              pattern="[1-9]|10" // Ensures only numbers between 1 and 10 are accepted
+                              pattern="[1-7]|8" // Ensures only numbers between 1 and 10 are accepted
                               className="input mt-1 p-1 rounded text-xs text-black"
-                              placeholder="Enter a score (1-10)"
+                              placeholder="Enter a score (1-8)"
                               value={scoreResume}
                               onChange={handleScoreChangeResume}
                             />
