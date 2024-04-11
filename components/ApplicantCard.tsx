@@ -26,6 +26,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
   onViewApplication,
 }) => {
   const [avatarUrl, setAvatarUrl] = useState<string>('');
+  const [numCaseStudies, setNumCaseStudies] = useState<number>(0);
   //const [total, setTotal] = useState(0);
   const supabase = createClient();
   useEffect(() => {
@@ -44,7 +45,23 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
     };
 
     fetchAvatarUrl();
-  }, [applicant.id, supabase]);
+  }, [applicant.id]);
+  useEffect(() => {
+    const fetchNumCaseStudies = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('case_studies')
+          .select('id', { count: 'exact' })
+          .eq('prospect', applicant.id)
+  
+        if (error) throw error;
+        if (count !== null) setNumCaseStudies(count);
+      } catch (error) {
+        console.error('Error fetching number of case studies:', error.message);
+      }
+    };
+    fetchNumCaseStudies();
+  }, []); // Add applicant.id as a dependency
 
   // useEffect(() => {
   //   const fetchTotal = async () => {
@@ -88,6 +105,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
           <div className="flex flex-col text-left ml-4">
             <h3 className="font-bold text-lg">{applicant.full_name}</h3>
             <p className="text-xs">{applicant.email}</p>
+            <p className="text-xs">{numCaseStudies} Case Studies</p>
           </div>
         </div>
         {/* <div className="mt-2">
