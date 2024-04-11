@@ -29,7 +29,11 @@ export default async function ProtectedPage() {
             Spring '24 Rush Application
           </p>
           <div className="w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8" />
-          <NameForm />
+          {/* <NameForm /> */}
+          <p className="text-md lg:text-lg !leading-tight max-w-xl text-left mt-8 mb-2 px-10">
+            The application deadline has passed. If any issues arise, contact
+            AJ/Christen at 6507720579/5103345535.
+          </p>
         </div>
       </div>
     </div>
