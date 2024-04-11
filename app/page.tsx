@@ -33,6 +33,7 @@ export default async function Index() {
           <div className="text-gray-400 text-xs mt-4">
             *When signing in, it will ask to continue to {' '}
             <span className='font-bold'>kvuilkasrtgyazkvxjal.supabase.co</span>
+            <p className="text-gray-500 mt-4">If you're having any issues or have any questions, please contact AJ/Christen @ 6507720579/5103345535</p>
           </div>
         </main>
       </div>
