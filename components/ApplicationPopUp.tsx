@@ -983,7 +983,16 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
       {viewDocument && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
           <div className="relative bg-white rounded-lg w-full max-w-4xl h-3/4 overflow-auto">
-            <iframe src={viewDocument} className="w-full h-full"></iframe>
+            {viewDocument.endsWith('.doc') || viewDocument.endsWith('.docx') ? (
+              // Render this iframe if viewDocument ends with .doc or .docx
+              <iframe
+                src={`https://view.officeapps.live.com/op/embed.aspx?src=${viewDocument}`}
+                className="w-full h-full"
+              ></iframe>
+            ) : (
+              // Render this iframe if it does not end with .doc or .docx
+              <iframe src={viewDocument} className="w-full h-full"></iframe>
+            )}
             <button
               onClick={() => setViewDocument(null)}
               className="absolute top-0 right-0 mt-4 mr-4 text-lg bg-red-600 hover:bg-red-800 text-white font-bold py-2 px-4 rounded"
