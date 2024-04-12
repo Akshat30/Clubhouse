@@ -56,7 +56,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
   
         if (error) throw error;
         if (count !== null) setNumCaseStudies(count);
-      } catch (error) {
+      } catch (error : any) {
         console.error('Error fetching number of case studies:', error.message);
       }
     };
