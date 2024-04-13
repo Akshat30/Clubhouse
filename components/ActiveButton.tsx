@@ -32,7 +32,7 @@ const ActiveButton: React.FC<ActiveButtonProps> = ({ is_active }) => {
         className="py-2 px-4 rounded-md bg-btn-background hover:bg-btn-background-hover focus:outline-none focus:ring flex items-center"
         onClick={() => setIsOpen(!isOpen)}
       >
-        Active Portal
+        Active
         <span className={`${isOpen ? 'rotate-180' : ''} inline-block ml-2`}>
           &#x25B4; {/* Unicode Downwards Arrow */}
         </span>

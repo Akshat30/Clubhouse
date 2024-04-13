@@ -30,7 +30,7 @@ const PICButton: React.FC<PICButtonProps> = ({ is_pic }) => {
     <div className="">
       <Link href="/pic">
         <button className="py-2 px-4 rounded-md bg-btn-background hover:bg-btn-background-hover focus:outline-none focus:ring flex items-center">
-          PIC Portal
+          PIC
         </button>
       </Link>
     </div>

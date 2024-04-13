@@ -31,7 +31,7 @@ export default function Navbar({ isPIC, isActive, user }: NavbarProps) {
               height={40}
               className="sm:w-[2rem] sm:mr-3"
             ></Image>
-            <span className="hidden sm:block text-xl">UCSD Alpha Kappa Psi</span>{' '}
+            <span className="hidden xl:block xl:text-xl">UCSD Alpha Kappa Psi</span>{' '}
           </div>
         </Link>
         <div className="sm:hidden">

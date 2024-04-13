@@ -42,8 +42,8 @@ const AuthButton: React.FC<AuthButtonProps> = ({ user }) => {
   };
 
   return user ? (
-    <div className="flex items-center gap-4">
-      Hey, {user.user_metadata.name}!
+    <div className="flex text-xs lg:text-lg items-center gap-4">
+      {user.user_metadata.name}
       <button
         onClick={signOut}
         className="py-2 px-4 rounded-md no-underline bg-btn-background hover:bg-btn-background-hover"

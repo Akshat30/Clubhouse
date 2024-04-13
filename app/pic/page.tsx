@@ -24,6 +24,7 @@ import {
 } from '../supabase/getUsers';
 import ApplicationPopup from '@/components/ApplicationPopUp';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { toast } from 'react-toastify';
 
 interface Packet {
   id: string;
@@ -171,11 +172,11 @@ export default function ProtectedPage() {
 
       if (insertError) throw insertError;
 
-      alert('Delibs submitted successfully');
+      toast.success('Delibs submitted successfully');
       setSelectedApplicants([]); // Reset selection
     } catch (error) {
       console.error('Error handling delibs:', error);
-      alert('Failed to handle delibs');
+      toast.success('Failed to handle delibs');
     }
   };
 

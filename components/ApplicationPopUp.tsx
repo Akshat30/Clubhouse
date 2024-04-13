@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { createClient } from '@/utils/supabase/client';
+import { toast } from 'react-toastify';
 import Image from 'next/image';
 
 interface Application {
@@ -72,6 +73,11 @@ interface Case {
   additional: string;
 }
 
+interface Comment {
+  active_name: string;
+  comment: string;
+}
+
 interface ApplicationPopupProps {
   application: Application;
   cases: Case[];
@@ -97,7 +103,35 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
   const [currentScore, setCurrentScore] = useState('');
 
   const [scoreResume, setScoreResume] = useState('');
+  const [activeName, setActiveName] = useState('');
+  const [comment, setComment] = useState('');
+  const [prospectComments, setProspectComments] = useState<Comment[]>([]);
+  const [submissionCount, setSubmissionCount] = useState(0);
+
   const [currentScoreResume, setCurrentScoreResume] = useState(''); // State to store the current score fetched from the database
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('comments')
+          .select('active_name, comment');
+
+        if (error) {
+          throw error;
+        }
+
+        console.log('Fetched comments:', data);
+        if (data) {
+          setProspectComments(data);
+        }
+      } catch (error: any) {
+        console.error('Error fetching comments:', error.message);
+      }
+    };
+
+    fetchComments();
+  }, [submissionCount]);
 
   const handleViewDocument = (documentUrl: string) => {
     setViewDocument(documentUrl);
@@ -266,6 +300,16 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
     }
   };
 
+  const handleActiveName = (e: any) => {
+    const value = e.target.value;
+    setActiveName(value);
+  };
+
+  const handleComment = (e: any) => {
+    const value = e.target.value;
+    setComment(value);
+  };
+
   useEffect(() => {
     const fetchCurrentScoreResume = async () => {
       const { data, error } = await supabase
@@ -288,7 +332,7 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
 
   const handleSubmit = async () => {
     if (score === '') {
-      alert('Please enter a score before submitting.');
+      toast.error('Please enter a score before submitting.');
       return;
     }
 
@@ -300,9 +344,9 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
       .eq('id', userID);
 
     if (error) {
-      alert(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     } else {
-      alert('Score updated successfully!');
+      toast.success('Score updated successfully!');
       setScore(''); // Optionally reset the score input after successful submission
     }
   };
@@ -325,6 +369,35 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
     } else {
       alert('Score updated successfully!');
       setScoreResume(''); // Optionally reset the score input after successful submission
+    }
+  };
+
+  const handleCommentSubmit = async () => {
+    if (activeName === '' || comment === '') {
+      toast.error('Please enter a name and comment before submitting.');
+      return;
+    }
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { data, error } = await supabase.from('comments').insert([
+      {
+        prospect_id: userID,
+        active_id: user?.id,
+        active_name: activeName,
+        comment: comment,
+      },
+    ]);
+
+    if (error) {
+      toast.error(`Error: ${error.message}`);
+    } else {
+      toast.success('Comment submitted.');
+      setSubmissionCount((count) => count + 1);
+      setActiveName(''); // Optionally reset the score input after successful submission
+      setComment('');
     }
   };
 
@@ -456,7 +529,7 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                   : 'text-gray-500 border-transparent'
               } font-semibold hover:text-blue-500 hover:border-blue-500 focus:outline-none`}
             >
-              Case Study Notes
+              Case Study
             </button>
             <button
               onClick={() => setActiveSection('interviews')}
@@ -466,7 +539,17 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                   : 'text-gray-500 border-transparent'
               } font-semibold hover:text-blue-500 hover:border-blue-500 focus:outline-none`}
             >
-              Interview Notes
+              Interview
+            </button>
+            <button
+              onClick={() => setActiveSection('comments')}
+              className={`px-4 py-3 ml-2 ${
+                activeSection === 'comments'
+                  ? 'text-blue-500 border-blue-500 border-b-2'
+                  : 'text-gray-500 border-transparent'
+              } font-semibold hover:text-blue-500 hover:border-blue-500 focus:outline-none`}
+            >
+              Comments
             </button>
           </div>
           <div>
@@ -929,6 +1012,64 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                       ))}
                   </>
                 )}
+              </div>
+            )}
+
+            {activeSection === 'comments' && (
+              <div className="">
+                <h3 className="font-semibold text-xl mb-2">
+                  Prospect Comments
+                </h3>
+                {isPIC ? (
+                  <>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Comment Input
+                    </h3>
+                    <div className="flex gap-4 flex-wrap mt-2 mb-4">
+                      <div className="flex items-center">
+                        <input
+                          type="text"
+                          className="input mt-1 py-1 px-2 mr-2 rounded text-lg text-black"
+                          placeholder="Active name"
+                          value={activeName}
+                          onChange={handleActiveName}
+                        />{' '}
+                        <div className="w-full">
+                          <input
+                            type="text"
+                            className="input mt-1 py-1 px-2 mr-2 rounded text-lg text-black"
+                            placeholder="Prospect comment"
+                            value={comment}
+                            onChange={handleComment}
+                          />
+                        </div>
+                        <button
+                          onClick={handleCommentSubmit}
+                          className="bg-blue-500 hover:bg-blue-700 text-lg text-white font-bold mt-1 py-1 px-2 rounded"
+                        >
+                          Submit
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <></>
+                )}
+                <div className="">
+                  <h3 className="font-semibold text-lg mb-2">Comments</h3>
+                  <ul>
+                    {prospectComments.map((comment, index) => (
+                      <li key={index} className="mt-4 text-lg text-white">
+                        <span className="font-bold bg-gray-700 rounded p-2">
+                          {comment.active_name}:
+                        </span>
+                        <span className="font-regular ml-2 bg-gray-700 rounded p-2">
+                          {comment.comment}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             )}
 

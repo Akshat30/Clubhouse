@@ -27,6 +27,11 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
 }) => {
   const [avatarUrl, setAvatarUrl] = useState<string>('');
   const [numCaseStudies, setNumCaseStudies] = useState<number>(0);
+  const [caseActives, setCaseActives] = useState<string[]>([]);
+
+  const [numInterviews, setNumInterviews] = useState<number>(0);
+  const [interviewActives, setInterviewActives] = useState<string[]>([]);
+
   //const [total, setTotal] = useState(0);
   const supabase = createClient();
   useEffect(() => {
@@ -49,18 +54,49 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
   useEffect(() => {
     const fetchNumCaseStudies = async () => {
       try {
-        const { count, error } = await supabase
+        const { data, error } = await supabase
           .from('case_studies')
-          .select('id', { count: 'exact' })
-          .eq('prospect', applicant.id)
-  
-        if (error) throw error;
-        if (count !== null) setNumCaseStudies(count);
-      } catch (error : any) {
+          .select('active_name') // Ensure 'active_name' is included in your select clause
+          .eq('prospect', applicant.id);
+
+        if (error) {
+          console.error('Error fetching active names:', error);
+          return;
+        }
+
+        // Assuming 'data' is an array of objects where each object contains 'active_name'
+        const names = data.map((item) => item.active_name);
+        setCaseActives(names); // Setting the state with the array of names
+        setNumCaseStudies(names.length);
+      } catch (error: any) {
         console.error('Error fetching number of case studies:', error.message);
       }
     };
     fetchNumCaseStudies();
+  }, []); // Add applicant.id as a dependency
+
+  useEffect(() => {
+    const fetchInterviews = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('interviews')
+          .select('active_name') // Ensure 'active_name' is included in your select clause
+          .eq('prospect_id', applicant.id);
+
+        if (error) {
+          console.error('Error fetching active names:', error);
+          return;
+        }
+
+        // Assuming 'data' is an array of objects where each object contains 'active_name'
+        const names = data.map((item) => item.active_name);
+        setInterviewActives(names); // Setting the state with the array of names
+        setNumInterviews(names.length);
+      } catch (error: any) {
+        console.error('Error fetching number of interviews:', error.message);
+      }
+    };
+    fetchInterviews();
   }, []); // Add applicant.id as a dependency
 
   // useEffect(() => {
@@ -70,7 +106,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
   //         .from('users')
   //         .select('total_score')
   //         .eq('id', applicant.id);
-        
+
   //       if (error) throw error;
   //       if (data) setTotal(data[0].total_score);
   //     } catch (error: any) {
@@ -98,15 +134,36 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
               className="w-12 h-12 rounded-full object-cover"
             />
           ) : (
-            <div className="w-12 h-12 rounded-full bg-gray-200 flex text-xs items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-gray-200 text-xs pt-2 items-center justify-center">
               <span className="text-gray-500">No Image</span>
             </div>
           )}
           <div className="flex flex-col text-left ml-4">
             <h3 className="font-bold text-lg">{applicant.full_name}</h3>
-            <p className="text-xs">{applicant.email}</p>
-            <p className="text-xs">{numCaseStudies} Case Studies</p>
+            <p className="text-xs">
+              <i>{applicant.email}</i>
+            </p>
           </div>
+        </div>
+        <div className="mt-2 text-left">
+          {numCaseStudies === 3 ? (
+            <p className="text-xs text-green-500">
+              {numCaseStudies} Cases: {caseActives.join(', ')}
+            </p>
+          ) : (
+            <p className="text-xs text-red-500">
+              {numCaseStudies} Cases: {caseActives.join(', ')}
+            </p>
+          )}
+          {numInterviews === 3 ? (
+            <p className="text-xs text-green-500">
+              {numInterviews} IVs: {interviewActives.join(', ')}
+            </p>
+          ) : (
+            <p className="text-xs text-red-500">
+              {numInterviews} IVs: {interviewActives.join(', ')}
+            </p>
+          )}
         </div>
         {/* <div className="mt-2">
           <span>Total Score: {total}</span>
