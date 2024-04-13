@@ -95,8 +95,12 @@ export default function ActiveInterviewForm({
         </h1>
         <div></div>
       </div>
+      <h1 className="text-xl lg:text-2xl font-bold text-center my-8 px-4 py-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 animate-pulse">
+  EVERYONE SAY HUGE THANK YOU TO AJ FOR MAKING SUCH A SEXY INTERVIEW FORM
+</h1>
       <form onSubmit={handleSubmit(onSubmit, onError)}>
         <div className="mb-5 flex items-center space-x-4">
+   
           <label htmlFor="name" className="mb-0 flex-shrink-0">
             Active Name:
           </label>
