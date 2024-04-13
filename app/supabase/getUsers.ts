@@ -213,7 +213,9 @@ export async function getInterviewProspects(): Promise<
       .from('users')
       .select('full_name, email, id')
       .eq('is_active', false)
-      .eq('is_pic', false);
+      .eq('is_pic', false)
+      .eq('cased', true)
+      .order('full_name', { ascending: true });
 
     if (error) {
       console.error('Error fetching interview prospects:', error.message);
