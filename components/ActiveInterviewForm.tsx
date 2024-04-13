@@ -69,7 +69,9 @@ export default function ActiveInterviewForm({
     }
   };
   const onError = (errors: any) => {
-    const errorMessages = Object.values(errors).map((error: any) => error.message || 'An error occurred');
+    const errorMessages = Object.values(errors).map(
+      (error: any) => error.message || 'An error occurred'
+    );
     const errorMessageString = errorMessages.join(', ');
     toast.error(`Form submission errors: ${errorMessageString}`);
   };
@@ -96,11 +98,10 @@ export default function ActiveInterviewForm({
         <div></div>
       </div>
       <h1 className="text-xl lg:text-2xl font-bold text-center my-8 px-4 py-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 animate-pulse">
-  EVERYONE SAY HUGE THANK YOU TO AJ FOR MAKING SUCH A SEXY INTERVIEW FORM
-</h1>
+        Remember to be nice. You got this!
+      </h1>
       <form onSubmit={handleSubmit(onSubmit, onError)}>
         <div className="mb-5 flex items-center space-x-4">
-   
           <label htmlFor="name" className="mb-0 flex-shrink-0">
             Active Name:
           </label>
@@ -137,8 +138,8 @@ export default function ActiveInterviewForm({
           )}
         </div>
         <div className="mt-4 text-center">
-          ***Script is in <span className="text-blue-400 text-lg">BLUE</span> and
-          side notes are in{' '}
+          ***Script is in <span className="text-blue-400 text-lg">BLUE</span>{' '}
+          and side notes are in{' '}
           <span className="text-gray-400 italic text-sm">GRAY</span>***
         </div>
         <div className="w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8" />
@@ -299,10 +300,10 @@ export default function ActiveInterviewForm({
                     ))}
                   </select>
                   {errors[trait.propertyName] && (
-              <p className="text-red-500">{`${
-                errors[trait.propertyName]?.message || 'Required!'
-              }`}</p>
-            )}{' '}
+                    <p className="text-red-500">{`${
+                      errors[trait.propertyName]?.message || 'Required!'
+                    }`}</p>
+                  )}{' '}
                 </div>
                 <p className="text-gray-400 italic text-sm flex-1">
                   {trait.note}
