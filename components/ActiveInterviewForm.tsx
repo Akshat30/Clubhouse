@@ -69,7 +69,9 @@ export default function ActiveInterviewForm({
     }
   };
   const onError = (errors: any) => {
-    toast.error('Form submission errors:', errors.message);
+    const errorMessages = Object.values(errors).map((error: any) => error.message || 'An error occurred');
+    const errorMessageString = errorMessages.join(', ');
+    toast.error(`Form submission errors: ${errorMessageString}`);
   };
 
   const handleBack = () => {
@@ -292,6 +294,11 @@ export default function ActiveInterviewForm({
                       </option>
                     ))}
                   </select>
+                  {errors[trait.propertyName] && (
+              <p className="text-red-500">{`${
+                errors[trait.propertyName]?.message || 'Required!'
+              }`}</p>
+            )}{' '}
                 </div>
                 <p className="text-gray-400 italic text-sm flex-1">
                   {trait.note}
