@@ -116,7 +116,8 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
       try {
         const { data, error } = await supabase
           .from('comments')
-          .select('active_name, comment');
+          .select('active_name, comment')
+          .eq('prospect_id', userID);
 
         if (error) {
           throw error;
@@ -169,11 +170,12 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
     setIvAverages(calculateIvAverages(interviews));
   }, [interviews]);
 
-
   const calculateIvAverages = (interviews: Interview[]) => {
     const totalScores = interviews.reduce(
       (acc, curr) => {
-        const eventsCount = curr.events_attended ? curr.events_attended.split(',').length : 0;
+        const eventsCount = curr.events_attended
+          ? curr.events_attended.split(',').length
+          : 0;
         return {
           empathy: acc.empathy + curr.empathy,
           open_minded: acc.open_minded + curr.open_minded,
@@ -192,16 +194,18 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
         events_attended: 0,
       }
     );
-  
+
     const averages = {
       empathy: totalScores.empathy / interviews.length,
       open_minded: totalScores.open_minded / interviews.length,
       pledgeable: totalScores.pledgeable / interviews.length,
       motivated: totalScores.motivated / interviews.length,
       socially_aware: totalScores.socially_aware / interviews.length,
-      events_attended: Math.ceil(totalScores.events_attended / interviews.length),
+      events_attended: Math.ceil(
+        totalScores.events_attended / interviews.length
+      ),
     };
-  
+
     return averages;
   };
 
@@ -455,26 +459,41 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
   }, [userID, supabase]);
 
   const scoreComponents = useMemo(() => {
-    const pledgeFactor = Number((ivAverages.pledgeable / 5).toFixed(2)) * 15;  
-    const professionalFactor = Number((ivAverages.open_minded / 5).toFixed(2)) * 10;
+    const pledgeFactor = Number((ivAverages.pledgeable / 5).toFixed(2)) * 15;
+    const professionalFactor =
+      Number((ivAverages.open_minded / 5).toFixed(2)) * 10;
     const curious = Number((ivAverages.motivated / 5).toFixed(2)) * 7;
-    const events = Number((ivAverages.events_attended - 2));
-    const resumeScore = Number((parseInt(currentScoreResume) / 8).toFixed(2)) * 14;
+    const events = Number(ivAverages.events_attended - 2);
+    const resumeScore =
+      Number((parseInt(currentScoreResume) / 8).toFixed(2)) * 14;
     const coverLetterScore = application.cover_letter ? 1 : 0;
-    const applicationScore = Number((parseInt(currentScore) / 8).toFixed(2)) * 25;
+    const applicationScore =
+      Number((parseInt(currentScore) / 8).toFixed(2)) * 25;
     const teamworkScore = Number((averages.teamwork_avg / 5).toFixed(2)) * 10;
-    const leadershipScore = Number((averages.leadership_avg / 5).toFixed(2)) * 10;
-    const analyticalScore = Number((averages.analytical_avg / 5).toFixed(2)) * 5;
-    
-    const totalScore = pledgeFactor + professionalFactor + curious + events + resumeScore + coverLetterScore + applicationScore + teamworkScore + leadershipScore + analyticalScore;
-    
+    const leadershipScore =
+      Number((averages.leadership_avg / 5).toFixed(2)) * 10;
+    const analyticalScore =
+      Number((averages.analytical_avg / 5).toFixed(2)) * 5;
+
+    const totalScore =
+      pledgeFactor +
+      professionalFactor +
+      curious +
+      events +
+      resumeScore +
+      coverLetterScore +
+      applicationScore +
+      teamworkScore +
+      leadershipScore +
+      analyticalScore;
+
     return {
       totalScore,
       components: {
         pledgeFactor: { score: pledgeFactor, outOf: 15 },
         professionalFactor: { score: professionalFactor, outOf: 10 },
         curious: { score: curious, outOf: 7 },
-        events: { score: events, outOf: 3 }, 
+        events: { score: events, outOf: 3 },
         resumeScore: { score: resumeScore, outOf: 14 },
         coverLetterScore: { score: coverLetterScore, outOf: 1 },
         applicationScore: { score: applicationScore, outOf: 25 },
@@ -483,8 +502,13 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
         analyticalScore: { score: analyticalScore, outOf: 5 },
       },
     };
-  }, [ivAverages, averages, currentScore, currentScoreResume, application.cover_letter]);
-
+  }, [
+    ivAverages,
+    averages,
+    currentScore,
+    currentScoreResume,
+    application.cover_letter,
+  ]);
 
   useEffect(() => {
     const updateTot = async () => {
@@ -498,8 +522,9 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
           console.log(error.message);
           alert(`Error: ${error.message}`);
         }
-        if(isPIC){
-          toast.success('Total Score Updated');
+        if (isPIC) {
+          // toast.success('Total Score Updated');
+          console.log('Total Score Updated');
         }
       }
     };
@@ -575,19 +600,18 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
             >
               Comments
             </button>
-            {isPIC &&  (
-               <button
-               onClick={() => setActiveSection('scoring')}
-               className={`px-4 py-3 ml-2 ${
-                 activeSection === 'comments'
-                   ? 'text-blue-500 border-blue-500 border-b-2'
-                   : 'text-gray-500 border-transparent'
-               } font-semibold hover:text-blue-500 hover:border-blue-500 focus:outline-none`}
-             >
-               Scoring
-             </button>
+            {isPIC && (
+              <button
+                onClick={() => setActiveSection('scoring')}
+                className={`px-4 py-3 ml-2 ${
+                  activeSection === 'comments'
+                    ? 'text-blue-500 border-blue-500 border-b-2'
+                    : 'text-gray-500 border-transparent'
+                } font-semibold hover:text-blue-500 hover:border-blue-500 focus:outline-none`}
+              >
+                Scoring
+              </button>
             )}
-           
           </div>
           <div>
             <button
@@ -1111,18 +1135,21 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
             )}
             {activeSection === 'scoring' && (
               <div>
-              <h3 className="font-semibold text-xl mb-2">Prospect Scoring</h3>
-              <div>
-                <h4 className="font-semibold text-lg">Score Components</h4>
-                <ul>
-                  {Object.entries(scoreComponents.components).map(([key, { score, outOf }]) => (
-                    <li key={key}>{`${key}: ${score.toFixed(2)} / ${outOf}`}</li>
-                  ))}
-                </ul>
-                <p>Total Score: {scoreComponents.totalScore.toFixed(2)}</p>
+                <h3 className="font-semibold text-xl mb-2">Prospect Scoring</h3>
+                <div>
+                  <h4 className="font-semibold text-lg">Score Components</h4>
+                  <ul>
+                    {Object.entries(scoreComponents.components).map(
+                      ([key, { score, outOf }]) => (
+                        <li key={key}>{`${key}: ${score.toFixed(
+                          2
+                        )} / ${outOf}`}</li>
+                      )
+                    )}
+                  </ul>
+                  <p>Total Score: {scoreComponents.totalScore.toFixed(2)}</p>
+                </div>
               </div>
-            </div>
-                  
             )}
 
             {activeSection === 'avatar' && (
