@@ -35,6 +35,7 @@ interface Packet {
   email: string;
   active_case_studies: string | null; // Assuming active_case_studies could be null
   active_interviews: string | null; // Assuming active_interviews could be null
+  total_score: number | null;
 }
 
 export default function ProtectedPage() {

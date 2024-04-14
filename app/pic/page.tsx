@@ -38,6 +38,7 @@ interface Packet {
   email: string;
   active_case_studies: string | null; // Assuming active_case_studies could be null
   active_interviews: string | null; // Assuming active_interviews could be null
+  total_score: number | null;
 }
 
 export default function ProtectedPage() {
@@ -56,6 +57,7 @@ export default function ProtectedPage() {
   const [interviews, setInterviews] = useState<any[]>([]); // Use 'any[]' instead of '[]' to allow for arrays with any elements
   const [isLoading, setIsLoading] = useState(true); // Initialize loading state
   const [selectedApplicants, setSelectedApplicants] = useState<string[]>([]);
+  const [sortType, setSortType] = useState<'name' | 'score'>('name');
 
   const supabase = createClient();
 
@@ -67,6 +69,24 @@ export default function ProtectedPage() {
         return [...prevSelected, applicantId];
       }
     });
+  };
+
+  const sortUsers = () => {
+    if (sortType === 'name') {
+      const sortedByScore = [...usersData].sort((a, b) => {
+        const scoreA = a.total_score ?? 0;
+        const scoreB = b.total_score ?? 0;
+        return scoreB - scoreA; 
+      });
+      setUserData(sortedByScore);
+      setSortType('score');
+    } else {
+      const sortedByName = [...usersData].sort((a, b) =>
+        a.full_name.localeCompare(b.full_name)
+      );
+      setUserData(sortedByName);
+      setSortType('name');
+    }
   };
 
   useEffect(() => {
@@ -204,6 +224,12 @@ export default function ProtectedPage() {
                     DELIBS
                   </button>
                 </div>
+                <button
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold ml-4 py-2 px-4 rounded-lg"
+                    onClick={sortUsers}
+                  >
+                    Sort by {sortType === 'name' ? 'score' : 'name'}
+                  </button>
               </div>
 
               <div className="mt-4 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">

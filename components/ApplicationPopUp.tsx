@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'react-toastify';
 import Image from 'next/image';
+import { Toast } from 'react-toastify/dist/components';
 
 interface Application {
   id: string;
@@ -155,6 +156,7 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
     pledgeable: 0,
     motivated: 0,
     socially_aware: 0,
+    events_attended: 0,
   });
 
   const [averages, setAverages] = useState({
@@ -163,73 +165,43 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
     analytical_avg: 0,
     public_speaking_avg: 0,
   });
-
-  useEffect(() => {
-    let tot = parseFloat(
-      Object.values(ivAverages)
-        .reduce((acc, cur) => acc + cur, 0)
-        .toFixed(2)
-    );
-
-    tot += parseFloat(
-      Object.values(averages)
-        .reduce((acc, cur) => acc + cur, 0)
-        .toFixed(2)
-    );
-
-    tot += parseFloat(currentScore);
-    tot += parseFloat(currentScoreResume);
-
-    setTotal(tot);
-  }, [ivAverages, averages, currentScore, currentScoreResume]);
-
   useEffect(() => {
     setIvAverages(calculateIvAverages(interviews));
   }, [interviews]);
 
-  useEffect(() => {
-    const updateTot = async () => {
-      if (total > 0) {
-        const { data, error } = await supabase
-          .from('users')
-          .update({ total_score: total })
-          .eq('id', userID);
-
-        if (error) {
-          console.log(error.message);
-          alert(`Error: ${error.message}`);
-        }
-      }
-    };
-    updateTot();
-  }, [total]);
 
   const calculateIvAverages = (interviews: Interview[]) => {
     const totalScores = interviews.reduce(
-      (acc, curr) => ({
-        empathy: acc.empathy + curr.empathy,
-        open_minded: acc.open_minded + curr.open_minded,
-        pledgeable: acc.pledgeable + curr.pledgeable,
-        motivated: acc.motivated + curr.motivated,
-        socially_aware: acc.socially_aware + curr.socially_aware,
-      }),
+      (acc, curr) => {
+        const eventsCount = curr.events_attended ? curr.events_attended.split(',').length : 0;
+        return {
+          empathy: acc.empathy + curr.empathy,
+          open_minded: acc.open_minded + curr.open_minded,
+          pledgeable: acc.pledgeable + curr.pledgeable,
+          motivated: acc.motivated + curr.motivated,
+          socially_aware: acc.socially_aware + curr.socially_aware,
+          events_attended: acc.events_attended + eventsCount,
+        };
+      },
       {
         empathy: 0,
         open_minded: 0,
         pledgeable: 0,
         motivated: 0,
         socially_aware: 0,
+        events_attended: 0,
       }
     );
-
+  
     const averages = {
       empathy: totalScores.empathy / interviews.length,
       open_minded: totalScores.open_minded / interviews.length,
       pledgeable: totalScores.pledgeable / interviews.length,
       motivated: totalScores.motivated / interviews.length,
       socially_aware: totalScores.socially_aware / interviews.length,
+      events_attended: Math.ceil(totalScores.events_attended / interviews.length),
     };
-
+  
     return averages;
   };
 
@@ -482,6 +454,58 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
     fetchAvatarUrl();
   }, [userID, supabase]);
 
+  const scoreComponents = useMemo(() => {
+    const pledgeFactor = Number((ivAverages.pledgeable / 5).toFixed(2)) * 15;  
+    const professionalFactor = Number((ivAverages.open_minded / 5).toFixed(2)) * 10;
+    const curious = Number((ivAverages.motivated / 5).toFixed(2)) * 7;
+    const events = Number((ivAverages.events_attended - 2));
+    const resumeScore = Number((parseInt(currentScoreResume) / 8).toFixed(2)) * 14;
+    const coverLetterScore = application.cover_letter ? 1 : 0;
+    const applicationScore = Number((parseInt(currentScore) / 8).toFixed(2)) * 25;
+    const teamworkScore = Number((averages.teamwork_avg / 5).toFixed(2)) * 10;
+    const leadershipScore = Number((averages.leadership_avg / 5).toFixed(2)) * 10;
+    const analyticalScore = Number((averages.analytical_avg / 5).toFixed(2)) * 5;
+    
+    const totalScore = pledgeFactor + professionalFactor + curious + events + resumeScore + coverLetterScore + applicationScore + teamworkScore + leadershipScore + analyticalScore;
+    
+    return {
+      totalScore,
+      components: {
+        pledgeFactor: { score: pledgeFactor, outOf: 15 },
+        professionalFactor: { score: professionalFactor, outOf: 10 },
+        curious: { score: curious, outOf: 7 },
+        events: { score: events, outOf: 3 }, 
+        resumeScore: { score: resumeScore, outOf: 14 },
+        coverLetterScore: { score: coverLetterScore, outOf: 1 },
+        applicationScore: { score: applicationScore, outOf: 25 },
+        teamworkScore: { score: teamworkScore, outOf: 10 },
+        leadershipScore: { score: leadershipScore, outOf: 10 },
+        analyticalScore: { score: analyticalScore, outOf: 5 },
+      },
+    };
+  }, [ivAverages, averages, currentScore, currentScoreResume, application.cover_letter]);
+
+
+  useEffect(() => {
+    const updateTot = async () => {
+      if (scoreComponents.totalScore > 0) {
+        const { data, error } = await supabase
+          .from('users')
+          .update({ total_score: scoreComponents.totalScore })
+          .eq('id', userID);
+
+        if (error) {
+          console.log(error.message);
+          alert(`Error: ${error.message}`);
+        }
+        if(isPIC){
+          toast.success('Total Score Updated');
+        }
+      }
+    };
+    updateTot();
+  }, [scoreComponents.totalScore]);
+
   return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40">
       <div className="bg-btn-background rounded-lg shadow-xl p-6 w-full space-y-4 mx-4 overflow-auto">
@@ -551,6 +575,19 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
             >
               Comments
             </button>
+            {isPIC &&  (
+               <button
+               onClick={() => setActiveSection('scoring')}
+               className={`px-4 py-3 ml-2 ${
+                 activeSection === 'comments'
+                   ? 'text-blue-500 border-blue-500 border-b-2'
+                   : 'text-gray-500 border-transparent'
+               } font-semibold hover:text-blue-500 hover:border-blue-500 focus:outline-none`}
+             >
+               Scoring
+             </button>
+            )}
+           
           </div>
           <div>
             <button
@@ -725,7 +762,7 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                       </li>
                       <li>
                         <span className="font-semibold">
-                          Total Score: {total}
+                          Total Score: {scoreComponents.totalScore.toFixed(2)}
                         </span>
                       </li>
                     </ul>
@@ -1071,6 +1108,21 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                   </ul>
                 </div>
               </div>
+            )}
+            {activeSection === 'scoring' && (
+              <div>
+              <h3 className="font-semibold text-xl mb-2">Prospect Scoring</h3>
+              <div>
+                <h4 className="font-semibold text-lg">Score Components</h4>
+                <ul>
+                  {Object.entries(scoreComponents.components).map(([key, { score, outOf }]) => (
+                    <li key={key}>{`${key}: ${score.toFixed(2)} / ${outOf}`}</li>
+                  ))}
+                </ul>
+                <p>Total Score: {scoreComponents.totalScore.toFixed(2)}</p>
+              </div>
+            </div>
+                  
             )}
 
             {activeSection === 'avatar' && (

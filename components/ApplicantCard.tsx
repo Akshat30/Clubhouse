@@ -14,6 +14,7 @@ interface Packet {
   email: string;
   active_case_studies: string | null; // Assuming active_case_studies could be null
   active_interviews: string | null; // Assuming active_interviews could be null
+  total_score: number | null;
 }
 
 interface ApplicantCardProps {
@@ -164,6 +165,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
               {numInterviews} IVs: {interviewActives.join(', ')}
             </p>
           )}
+          <p className="text-xs">Total Score: {applicant.total_score ? applicant.total_score : "click to set"}</p>
         </div>
         {/* <div className="mt-2">
           <span>Total Score: {total}</span>
