@@ -616,13 +616,22 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
           <div>
             <button
               onClick={() => handleViewDocument(application.resume)}
-              className="px-4 py-2 ml-2 bg-gray-500 hover:bg-gray-700 text-white font-bold rounded"
+              className={
+                application.resume
+                  ? 'px-4 py-2 ml-2 bg-green-500 hover:bg-green-700 text-white font-bold rounded'
+                  : 'px-4 py-2 ml-2 bg-gray-500 hover:bg-gray-700 text-white font-bold rounded'
+              }
             >
               Resume
             </button>
+
             <button
               onClick={() => handleViewDocument(application.cover_letter)}
-              className="px-4 py-2 ml-2 bg-gray-500 hover:bg-gray-700 text-white font-bold rounded"
+              className={
+                application.cover_letter
+                  ? 'px-4 py-2 ml-2 bg-green-500 hover:bg-green-700 text-white font-bold rounded'
+                  : 'px-4 py-2 ml-2 bg-gray-500 hover:bg-gray-700 text-white font-bold rounded'
+              }
             >
               Cover Letter
             </button>
