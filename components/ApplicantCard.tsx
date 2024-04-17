@@ -165,7 +165,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
               {numInterviews} IVs: {interviewActives.join(', ')}
             </p>
           )}
-          <p className="text-xs">Total Score: {applicant.total_score ? applicant.total_score : "click to set"}</p>
+          <p className="text-xs">Total Score: type shieeetttt</p>
         </div>
         {/* <div className="mt-2">
           <span>Total Score: {total}</span>

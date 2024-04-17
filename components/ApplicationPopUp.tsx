@@ -722,7 +722,10 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                     <h3 className="text-2xl font-bold text-white mb-3">
                       Scoring
                     </h3>
-                    <ul className="list-disc pl-5 space-y-2 text-gray-200">
+                    <div>
+                      <p>type shiiiittt lmaooooooo</p>
+                    </div>
+                    {/* <ul className="list-disc pl-5 space-y-2 text-gray-200">
                       <li>
                         <span className="font-semibold">Case Study:</span>{' '}
                         {Object.values(averages)
@@ -798,7 +801,7 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                           Total Score: {scoreComponents.totalScore.toFixed(2)}
                         </span>
                       </li>
-                    </ul>
+                    </ul> */}
                   </div>
                 </div>
 
@@ -870,7 +873,8 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                       Leadership:{' '}
                     </span>
                     <span className="text-md font-bold">
-                      {averages.leadership_avg.toFixed(2)}
+                      {/* {averages.leadership_avg.toFixed(2)} */}
+                      t
                     </span>
                   </div>
                   <div className="p-4 rounded-lg shadow-md bg-gray-600 text-center">
@@ -878,7 +882,8 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                       Teamwork:{' '}
                     </span>
                     <span className="text-md font-bold">
-                      {averages.teamwork_avg.toFixed(2)}
+                      {/* {averages.teamwork_avg.toFixed(2)} */}
+                      y
                     </span>
                   </div>
                   <div className="p-4 rounded-lg shadow-md bg-gray-600 text-center">
@@ -886,7 +891,8 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                       Analytical:{' '}
                     </span>
                     <span className="text-md font-bold">
-                      {averages.analytical_avg.toFixed(2)}
+                      {/* {averages.analytical_avg.toFixed(2)} */}
+                      p
                     </span>
                   </div>
                   <div className="p-4 rounded-lg shadow-md bg-gray-600 text-center">
@@ -894,7 +900,8 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                       Public Speaking:{' '}
                     </span>
                     <span className="text-md font-bold">
-                      {averages.public_speaking_avg.toFixed(2)}
+                      {/* {averages.public_speaking_avg.toFixed(2)} */}
+                      e
                     </span>
                   </div>
                 </div>
@@ -1015,7 +1022,8 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
                         {key}:{' '}
                       </span>
                       <span className="text-md font-bold">
-                        {isNaN(value) ? 'N/A' : value.toFixed(2)}
+                        {/* {isNaN(value) ? 'N/A' : value.toFixed(2)} */}
+                        type shitttt
                       </span>
                     </div>
                   ))}
@@ -1144,21 +1152,18 @@ const ApplicationPopup: React.FC<ApplicationPopupProps> = ({
             )}
             {activeSection === 'scoring' && (
               <div>
-                <h3 className="font-semibold text-xl mb-2">Prospect Scoring</h3>
-                <div>
-                  <h4 className="font-semibold text-lg">Score Components</h4>
-                  <ul>
-                    {Object.entries(scoreComponents.components).map(
-                      ([key, { score, outOf }]) => (
-                        <li key={key}>{`${key}: ${score.toFixed(
-                          2
-                        )} / ${outOf}`}</li>
-                      )
-                    )}
-                  </ul>
-                  <p>Total Score: {scoreComponents.totalScore.toFixed(2)}</p>
-                </div>
+              <h3 className="font-semibold text-xl mb-2">Prospect Scoring</h3>
+              <div>
+                <h4 className="font-semibold text-lg">Score Components</h4>
+                <ul>
+                  {Object.entries(scoreComponents.components).map(([key, { score, outOf }]) => (
+                    <li key={key}>{`${key}: ${score.toFixed(2)} / ${outOf}`}</li>
+                  ))}
+                </ul>
+                {/* <p>Total Score: {scoreComponents.totalScore.toFixed(2)}</p> */}
               </div>
+            </div>
+                  
             )}
 
             {activeSection === 'avatar' && (
